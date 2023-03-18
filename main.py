@@ -17,8 +17,17 @@ path_titles = './dataset/titles/'
 path_rating = './dataset/ratings/'
 etl = ETL_class(path_titles, path_rating)
 
-df_movies = etl.get_movies()
-df_ratings = etl.get_ratings()
+# df_movies = etl.get_movies()
+# df_ratings = etl.get_ratings()
+
+df_movies, df_ratings = [], []
+for t in etl.get_csv_files(path_titles):
+    df_movies.append(pd.read_csv(path_titles + t))
+df_movies = pd.concat(df_movies)
+
+for r in etl.get_csv_files(path_rating):
+    df_ratings.append(pd.read_csv(path_rating + r))
+df_ratings = pd.concat(df_ratings)
 
 # last_year = np.sort(df_movies['release_year'].unique())[-1]
 
@@ -41,6 +50,8 @@ def get_max_duration(year: int, platform: str, duration_type: str):
     result = {c: v for (c,v) in zip(column, row.values[0])}
     # print("The longest movie or series in duration [{}] is '{}', it lasts {} {}".format(duration_type, row['title'].values[0],row['duration_int'].values[0],duration_type))
     return result
+
+# print(get_max_duration(2018, 'amazon', 'min'))
 
 @app.get("/function2/{platform},{scored},{year}")
 def get_score_count(platform: str, scored: float, year: int):

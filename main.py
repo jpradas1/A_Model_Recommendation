@@ -14,8 +14,7 @@ from ETL import ETL_class
 app = FastAPI()
 
 path_titles = './dataset/titles/'
-path_rating = './dataset/ratings/'
-etl = ETL_class(path_titles, path_rating)
+etl = ETL_class(path_titles)
 
 # df_movies = etl.get_movies()
 # df_ratings = etl.get_ratings()
@@ -24,10 +23,6 @@ df_movies, df_ratings = [], []
 for t in etl.get_csv_files(path_titles):
     df_movies.append(pd.read_csv(path_titles + t))
 df_movies = pd.concat(df_movies)
-
-for r in etl.get_csv_files(path_rating):
-    df_ratings.append(pd.read_csv(path_rating + r))
-df_ratings = pd.concat(df_ratings)
 
 # last_year = np.sort(df_movies['release_year'].unique())[-1]
 
@@ -58,16 +53,18 @@ def get_score_count(platform: str, scored: float, year: int):
     platform = unidecode(platform).lower()
     
     begins = platform[0]
-    df = df_movies[['id', 'release_year']]
+    df = df_movies[['id', 'release_year', 'rating']]
     df = df.loc[df.release_year == year]
     df = df.loc[df['id'].str.contains('^{}'.format(begins))]
     
-    merge = df.merge(df_ratings[['movieId', 'rating']], left_on='id',right_on='movieId')
-    merge = merge[['id', 'rating']].groupby(['id']).agg('mean')
+    # merge = df.merge(df_ratings[['movieId', 'rating']], left_on='id',right_on='movieId')
+    # merge = merge[['id', 'rating']].groupby(['id']).agg('mean')
 
-    result = merge[merge.rating >= scored].shape[0]
+    result = df[df.rating >= scored].shape[0]
     # return result
     return 'result: {}'.format(result)
+
+print(get_score_count('amazon', 2.5, 2006))
 
 @app.get("/function3/{platform}")
 def get_count_platform(platform: str):

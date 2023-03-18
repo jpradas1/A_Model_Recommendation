@@ -1,27 +1,28 @@
 from fastapi import FastAPI
-# from pydantic import BaseModel
-# from typing import Optional
 
 import numpy as np
 import pandas as pd
+import re
+import os
 from unidecode import unidecode
-
-# import sys
-# sys.path.append('../')
-
-from ETL import ETL_class
 
 app = FastAPI()
 
-path_titles = './dataset/titles/'
-etl = ETL_class(path_titles)
+def get_csv_files(path):
+    raw_files = os.listdir(path)
+    file = []
+    for item in raw_files:
+        p = re.findall("(\w*\.csv)", item)
+        if p:
+            file.append(p[0])
+    return np.sort(file)
 
-# df_movies = etl.get_movies()
-# df_ratings = etl.get_ratings()
+path_titles = './dataset/'
 
-df_movies, df_ratings = [], []
-for t in etl.get_csv_files(path_titles):
+df_movies = []
+for t in get_csv_files(path_titles):
     df_movies.append(pd.read_csv(path_titles + t))
+
 df_movies = pd.concat(df_movies)
 
 # last_year = np.sort(df_movies['release_year'].unique())[-1]

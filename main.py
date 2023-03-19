@@ -54,14 +54,14 @@ def get_score_count(platform: str, scored: float, year: int):
     platform = unidecode(platform).lower()
     
     begins = platform[0]
-    df = df_movies[['id', 'release_year', 'rating']]
+    df = df_movies[['id', 'release_year', 'mean_rating']]
     df = df.loc[df.release_year == year]
     df = df.loc[df['id'].str.contains('^{}'.format(begins))]
     
-    # merge = df.merge(df_ratings[['movieId', 'rating']], left_on='id',right_on='movieId')
-    # merge = merge[['id', 'rating']].groupby(['id']).agg('mean')
+    # merge = df.merge(df_ratings[['movieId', 'mean_rating']], left_on='id',right_on='movieId')
+    # merge = merge[['id', 'mean_rating']].groupby(['id']).agg('mean')
 
-    result = df[df.rating >= scored].shape[0]
+    result = df[df.mean_rating >= scored].shape[0]
     # return result
     return 'result: {}'.format(result)
 

@@ -31,6 +31,7 @@ class Recommendation(object):
         self.Knneighbors = Knneighbors
 
     def etl_movie_rating(self):
+
         # etl for this model
         df_count = df_ratings[['userId','id']].groupby('id').count()
         df_count.reset_index(inplace=True)
@@ -77,23 +78,19 @@ class Recommendation(object):
     
     # get the movies watched by the user
     def get_sample_user(self, user: int, title: str):
+
         # we suppose is the exact title
         title = unidecode(title).lower()
 
         # records for this user
         df = self.etl_movie_rating()
         records = df.loc[df['userId'] == user, 'movieId'].values
+
         # movie id to get similarity
         movieid = df_movies.loc[df_movies['title'] == title, 'id'].values[0]
         movieid = df.loc[df['id'] == movieid, 'movieId'].values[0]
 
         return records, movieid
-
-    # def KNN_movie_genre(self):
-    #     # etl for this model
-
-    #     return None
-
 
     def get_recommendation(self, user: int, title: str, matching = 0.6):
         similarities = self.KNN_movie_rating(user, title)
@@ -107,12 +104,3 @@ class Recommendation(object):
             # print("The user '{}' may not like the film '{}'".format(user, title))
             return False
         # return matching
-
-# R = Recommendation(threshold=550)
-# user = 9
-# title = df_movies.loc[df_movies['id'] == 'as2006', 'title'].values[0]
-
-# print(R.get_recommendation(user, title, matching=0.01))
-# print(R.KNN_movie_rating(user, title))
-# print(R.total_similarity(9, title))
-# print(R.etl_movie_rating())

@@ -1,13 +1,8 @@
 from fastapi import FastAPI
-# from pydantic import BaseModel
-# from typing import Optional
 
 import numpy as np
 import pandas as pd
 from unidecode import unidecode
-
-# import sys
-# sys.path.append('../')
 
 from ETL import ETL_class
 
@@ -19,8 +14,6 @@ etl = ETL_class(path_titles, path_rating)
 
 df_movies = etl.get_movies()
 df_ratings = etl.get_ratings()
-
-# last_year = np.sort(df_movies['release_year'].unique())[-1]
 
 @app.get("/function1/{year},{platform},{duration_type}")
 def get_max_duration(year: int, platform: str, duration_type: str):
@@ -39,7 +32,6 @@ def get_max_duration(year: int, platform: str, duration_type: str):
     column = row.columns
 
     result = {c: v for (c,v) in zip(column, row.values[0])}
-    # print("The longest movie or series in duration [{}] is '{}', it lasts {} {}".format(duration_type, row['title'].values[0],row['duration_int'].values[0],duration_type))
     return result
 
 @app.get("/function2/{platform},{scored},{year}")
@@ -60,11 +52,7 @@ def get_score_count(platform: str, scored: float, year: int):
 
 @app.get("/function3/{platform}")
 def get_count_platform(platform: str):
-    # if platform == None:
-    #     result = df_movies[['id']].drop_duplicates()
-    #     result = df_movies.shape[0]
-    #     return result
-    # else:
+
     platform = unidecode(platform).lower()
     begins = platform[0]
     df = df_movies.loc[df_movies['id'].str.contains('^{}'.format(begins))]

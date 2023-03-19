@@ -24,11 +24,11 @@ df_ratings = etl.get_ratings()[['userId', 'rating', 'movieId']] \
 
 class Recommendation(object):
     
-    def __init__(self, rating_w = 0.5, genre_w = 0.5, threshold = 500, KNeighbors = 8):
+    def __init__(self, rating_w: float, genre_w: float, threshold: int, Knneighbors: int):
         self.threshold = threshold
         self.rating_w = rating_w
         self.genre_w = genre_w
-        self.KNeighbors = KNeighbors
+        self.Knneighbors = Knneighbors
 
     def etl_movie_rating(self):
         # etl for this model
@@ -42,7 +42,7 @@ class Recommendation(object):
         return df[['userId','movieId','rating', 'id']]
 
     def KNN_movie_rating(self, user: int, title: str):
-        knn = int(np.sqrt(self.KNeighbors)) + 1
+        knn = int(np.sqrt(self.Knneighbors)) + 1
         df = self.etl_movie_rating()
         movies_rating = df.pivot_table(index='movieId', columns='userId', values='rating')\
                         .fillna(0)
@@ -58,8 +58,8 @@ class Recommendation(object):
         records, recom = self.get_sample_user(user, title)
 
         sample2 = movies_rating.loc[recom, :].values.reshape(1,-1)
-
-        distances, indices = model_knn.kneighbors(sample2, n_neighbors=self.KNeighbors)
+        
+        distances, indices = model_knn.kneighbors(sample2, n_neighbors=self.Knneighbors)
         idx_sort = np.argsort(distances[0])[::-1]
         indices = [indices[0][ii] for ii in idx_sort]
 
@@ -101,10 +101,12 @@ class Recommendation(object):
         is_greater = similarities > matching
 
         if is_greater.any():
-            print("The movie '{}' is recommended for the user '{}'".format(title,user))
+            # print("The movie '{}' is recommended for the user '{}'".format(title,user))
+            return True
         else:
-            print("The user '{}' may not like the film '{}'".format(user, title))
-        return matching
+            # print("The user '{}' may not like the film '{}'".format(user, title))
+            return False
+        # return matching
 
 # R = Recommendation(threshold=550)
 # user = 9

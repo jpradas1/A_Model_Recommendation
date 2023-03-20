@@ -6,7 +6,18 @@ import re
 import os
 from unidecode import unidecode
 
-app = FastAPI()
+app = FastAPI(
+    title= 'API for Movie-Platform Queries',
+    description="This API works for executing 4 type of queries on the database \
+                about movies, their average ratings, titles, cast and so no. \
+                The database has information on 4 streaming platform, i.e., 'Amazon Prime' \
+                'Disney Plus', 'Hulu' and 'Netflix'. \n \
+                The first funciton returns the longest movie in duration by platform and \
+                platform. The second one tells us what is the amount of movies which have \
+                obtained an average rating greater than a score by year. The third one gives \
+                us the number of movies by platform. And the last one, returns the most frequent \
+                or common actor by platform and year."
+)
 
 def get_csv_files(path):
     raw_files = os.listdir(path)

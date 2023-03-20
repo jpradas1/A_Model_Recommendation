@@ -1,13 +1,29 @@
 import gradio as gr
+from unidecode import unidecode
+import re
 
 from Recommendation_System import Recommendation
 
-def find_title(title):
-    return None
+def message(title):
+    return "The movie {} is not in the dataset, please select another title or \n \
+            be sure you wrote it well or decrease the threshold"
 
 def main(user, title, KNN, Surprise, similarity, grade, threshold, KNeighbors):
-    KNeighbors = int(KNeighbors)
+    # we suppose is the exact title
+    title = unidecode(title).lower()
     R = Recommendation(threshold)
+
+    if title in R.get_titles():
+        return models(user, title, KNN, Surprise, similarity, grade, 
+                      threshold, KNeighbors, R)
+    else:
+        return message(title)
+
+def models(user, title, KNN, Surprise, similarity, grade, threshold, 
+           KNeighbors, R: Recommendation):
+
+    KNeighbors = int(KNeighbors)
+    # R = Recommendation(threshold)
 
     if KNN:
         return R.get_Crecommendation(user, title, similarity, KNeighbors)

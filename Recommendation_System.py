@@ -26,13 +26,22 @@ df_ratings = etl.get_ratings()[['userId', 'rating', 'movieId']] \
             .rename(columns={'movieId':'id'})
 
 class Recommendation(object):
-
-
     
     def __init__(self, threshold: int):
         self.threshold = threshold
 
-    def _etl_movie_rating(self):
+    def movieId(self, title: str):
+        title = unidecode(title).lower()
+        id = df_movies.loc[df_movies['title'] == title, 'id'].values[0]
+        return id
+    
+    def get_titles(self):
+        df = self.etl_movie_rating()
+        df_titles = pd.merge(df, df_movies, on='id', how='left')['title'].unique()
+        # df_titles = df_titles.['titles'].unique()
+        return df_titles
+
+    def etl_movie_rating(self):
 
         # etl for this model
         df_count = df_ratings[['userId','id']].groupby('id').count()
@@ -46,7 +55,7 @@ class Recommendation(object):
 
     def _KNN_movie_rating(self, user: int, title: str,  Knneighbors: int):
         knn = int(np.sqrt(Knneighbors)) + 1
-        df = self._etl_movie_rating()
+        df = self.etl_movie_rating()
         movies_rating = df.pivot_table(index='movieId', columns='userId', values='rating')\
                         .fillna(0)
         
@@ -85,7 +94,7 @@ class Recommendation(object):
         title = unidecode(title).lower()
 
         # records for this user
-        df = self._etl_movie_rating()
+        df = self.etl_movie_rating()
         records = df.loc[df['userId'] == user, 'movieId'].values
 
         # movie id to get similarity
@@ -122,32 +131,43 @@ class Recommendation(object):
         return prediction
     
     def get_Crecommendation(self, user: int, title: str, similarity: float, Knneighbors: int):
+        
+        # we suppose is the exact title
+        title = unidecode(title).lower()
+
         similarities = self._KNN_movie_rating(user, title, Knneighbors)
 
         is_greater = similarities > similarity
 
         if is_greater.any():
-            # print("The movie '{}' is recommended for the user '{}'".format(title,user))
-            return True
+            return "The movie '{}' is recommended for the user '{}'".format(title,user)
+            # return True
         else:
-            # print("The user '{}' may not like the film '{}'".format(user, title))
-            return False
+            return "The user '{}' may not like the film '{}'".format(user, title)
+            # return False
         # return matching
     
     def get_Srecomendation(self, user: int, title: str, grade: float):
 
+        # we suppose is the exact title
+        title = unidecode(title).lower()
+
         # movie = df_movies.loc[df_movies['title'] == title, 'id'].values[0]
         rating = self._surprise_recommendation(user, title)
 
-        print("For the movie '{}' the user '{}' would grade it at {:.2f}".format(title, user, rating))
+        # print("For the movie '{}' the user '{}' would grade it at {:.2f}".format(title, user, rating))
         if rating >= grade:
-            # print('Then the movie is recommended')
-            return True
+            return "The movie '{}' is recommended for the user '{}'".format(title,user)
+            # return True
         else:
-            # print('Then the movie is not recommended')
-            return False
+            return "The user '{}' may not like the film '{}'".format(user, title)
+            # return False
     
     def Cosine_surprise(self, user: int, title: str, similarity: float, grade: float, Knneighbors: int):
+        
+        # we suppose is the exact title
+        title = unidecode(title).lower()
+
         similarities = self._KNN_movie_rating(user, title, Knneighbors)
         v_max = max(similarities)
 
@@ -157,14 +177,6 @@ class Recommendation(object):
         limit = (similarity + grade/5.0) * 0.5
 
         if matching > limit:
-            return True
+            return "The movie '{}' is recommended for the user '{}'".format(title,user)
         else:
-            return False
-
-# R = Recommendation(rating_w=0.5, genre_w=0.5, threshold=500, Knneighbors=8)
-# user = 27833
-# title = df_movies.loc[df_movies['id'] == 'ds1', 'title'].values[0]
-# print(R.get_Srecomendation(27833, title, matching=3.5))
-# print(R.surprise_recommendation(user, title))
-# movie = df_movies.loc[df_movies['title'] == '', 'id'].values[0]
-# print(title)
+            return "The user '{}' may not like the film '{}'".format(user, title)

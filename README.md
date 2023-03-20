@@ -37,4 +37,5 @@ gradio gradio-app.py
 > - threshold: int (300 - 600). Filter data feeding the model by the number of times the movie has been graded
 > - KNeighbors: int (8 - 32). Number of neighbors the model will take into account.
 >
-> if both model are select each selection indice will be weighted at 0.5 and they will be summed.
+> If both model are select each selection indice will be weighted at 0.5 and they will be summed.
+> <img src=".src/gradio-app.png" width="1000">

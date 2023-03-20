@@ -16,6 +16,6 @@ Finally we run
 ```
 uvicorn main:app --reload
 ```
-and the api run in the localhost on port 8000 by default, i.e., (http://127.0.0.1:8000/).
+and the api run in the localhost on port 8000 by default, i.e., (http://127.0.0.1:8000/docs).
 ## On-Line
 This particular api is located on [FastAPI deploy](https://a-model-recommendation.onrender.com/docs) which run on the [render.com](https://render.com/) serves.

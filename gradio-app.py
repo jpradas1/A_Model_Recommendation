@@ -25,9 +25,9 @@ def models(user, title, KNN, Surprise, similarity, grade, threshold,
     KNeighbors = int(KNeighbors)
     # R = Recommendation(threshold)
 
-    if KNN:
+    if KNN and not Surprise:
         return R.get_Crecommendation(user, title, similarity, KNeighbors)
-    elif Surprise:
+    elif Surprise and not KNN:
         return R.get_Srecomendation(user, title, grade)
     else:
         return R.Cosine_surprise(user, title, similarity, grade, KNeighbors)
